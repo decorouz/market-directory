@@ -28,8 +28,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # third party apps
+    "rest_framework",
+
+    #local apps
     "mktdirectory",
+
+
 ]
+
+# REST_FRAMEWORK
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny"
+    ]
+}
 
 
 MIDDLEWARE = [

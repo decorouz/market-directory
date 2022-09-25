@@ -56,7 +56,7 @@ class Market(models.Model):
     longitude = models.FloatField(null=True)
     location_description = models.TextField(verbose_name="Market site")
     slug = models.SlugField(max_length=200)
-    referene_mkt_date = models.DateField(
+    reference_mkt_date = models.DateField(
         verbose_name=("Most recent market date")
     )
     created_at = models.DateTimeField(auto_now_add=True)

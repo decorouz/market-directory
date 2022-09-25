@@ -1,0 +1,14 @@
+<!-- books/templates/books/book_list.html -->
+
+<h1>All Commodities</h1>
+
+{% for commodity in object_list %}
+<ul>
+    <li>Category: {{ commodity.category}}</li>
+    <li>Name: {{ commodity.name}}</li>
+    <li>Description: {{ commodity.description}}</li>
+
+
+</ul>
+
+{% endfor %}
