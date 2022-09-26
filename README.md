@@ -11,4 +11,5 @@
     - Populate DB with dummy data
     - Create Viewsets and Serializers
     - Authentication, Authorization and Permission
-    - 
+    - Add slug fields. 
+    - Implement auto increasing uuid primary key
