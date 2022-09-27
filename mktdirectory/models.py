@@ -16,7 +16,7 @@ class Category(models.Model):
 
 class Commodity(models.Model):
 
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
     overview = models.TextField(
         verbose_name="Brief description of the commodity"
@@ -118,7 +118,8 @@ class MarketDay(models.Model):
         on_delete=models.CASCADE,
     )
     commodity = models.ForeignKey(
-        Commodity, on_delete=models.SET_NULL, null=True
+        Commodity,
+        on_delete=models.CASCADE,
     )
     grade = models.CharField(
         max_length=1, choices=PRODUCE_CHOICES, default=NEW_PRODUCE
