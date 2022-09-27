@@ -47,23 +47,23 @@ class ContactPerson(models.Model):
 
 
 class AcceptedPaymentMethod(models.Model):
-    CASH_PAYMENT = "CAS"
-    POS_PAYMENT = "POS"
-    BANK_TRANSFER_PAYMENT = "TF"
-    OTHER_PAYMENT = "O"
+    PAYMENT_METHOD_CASH = "CAS"
+    PAYMENT_METHOD_POS = "POS"
+    PAYMENT_METHOD_TRANSFER = "TF"
+    PAYMENT_METHOD_OTHERS = "O"
 
     PAYMENT_METHODS = [
-        (CASH_PAYMENT, "Cash Payment"),
-        (POS_PAYMENT, "POS"),
-        (BANK_TRANSFER_PAYMENT, "Bank Transfer"),
-        (OTHER_PAYMENT, "Others"),
+        (PAYMENT_METHOD_CASH, "Cash Payment"),
+        (PAYMENT_METHOD_POS, "POS"),
+        (PAYMENT_METHOD_TRANSFER, "Bank Transfer"),
+        (PAYMENT_METHOD_OTHERS, "Others"),
     ]
 
     name = models.CharField(
         verbose_name="Accepted Payments",
         max_length=3,
         choices=PAYMENT_METHODS,
-        default=CASH_PAYMENT,
+        default=PAYMENT_METHOD_CASH,
     )
     description = models.TextField()
     charges = models.FloatField(default=0.0)
@@ -81,7 +81,7 @@ class Market(models.Model):
         default=uuid.uuid4, unique=True, primary_key=True, editable=False
     )
     name = models.CharField(max_length=50)
-    accepted_payments = models.ManyToManyField(AcceptedPaymentMethod)
+    accepted_payment_types = models.ManyToManyField(AcceptedPaymentMethod)
     contact_person = models.ForeignKey(
         ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -90,7 +90,7 @@ class Market(models.Model):
     market_schedule = models.CharField(max_length=50)
 
     location_description = models.TextField(verbose_name="Market site")
-    slug = models.SlugField(max_length=200)
+    slug = models.SlugField(unique=True)
     reference_mkt_date = models.DateField(
         verbose_name=("Most recent market date")
     )

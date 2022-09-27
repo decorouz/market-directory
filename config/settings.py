@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # local apps
     "mktdirectory",
     "playground",
+    "tag"
 ]
 
 # REST_FRAMEWORK
