@@ -87,14 +87,13 @@ class Market(models.Model):
     )
     brief_details = models.TextField()
     num_vendors = models.SmallIntegerField()
-    market_schedule = models.CharField(max_length=50)
+    market_days_interval = models.SmallIntegerField(default=5)
 
     location_description = models.TextField(verbose_name="Market site")
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField()
     reference_mkt_date = models.DateField(
         verbose_name=("Most recent market date")
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
 
     class Meta:
