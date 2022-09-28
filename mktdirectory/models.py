@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 
 
 class Category(models.Model):
@@ -18,9 +17,7 @@ class Commodity(models.Model):
 
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
-    overview = models.TextField(
-        verbose_name="Brief description of the commodity"
-    )
+    overview = models.TextField(verbose_name="Commodity Description")
 
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -43,7 +40,7 @@ class ContactPerson(models.Model):
         db_table = "sql_contact_person"
 
     def __str__(self) -> str:
-        return f"{self.user.first_name} {self.user.last_name} "
+        return f"{self.first_name} {self.last_name} "
 
 
 class AcceptedPaymentMethod(models.Model):
@@ -59,7 +56,7 @@ class AcceptedPaymentMethod(models.Model):
         (PAYMENT_METHOD_OTHERS, "Others"),
     ]
 
-    name = models.CharField(
+    type = models.CharField(
         verbose_name="Accepted Payments",
         max_length=3,
         choices=PAYMENT_METHODS,
@@ -96,6 +93,7 @@ class Market(models.Model):
 
     class Meta:
         db_table = "sql_market"
+        ordering = ["market_code"]
 
     def __str__(self):
         return self.name
@@ -131,15 +129,7 @@ class MarketDay(models.Model):
 
     class Meta:
         db_table = "sql_market_date"
+        verbose_name = "Market Date"
 
-
-# class MarketAcceptedPayment(models.Model):
-#     market = models.ForeignKey(Market, on_delete=models.CASCADE)
-#     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
-#     charges = models.DecimalField(
-#         max_digits=5, decimal_places=2, verbose_name="Payment charges"
-#     )
-
-#     class Meta:
-#         db_table = "sql_accepted_payment"
-#         verbose_name_plural = "Market Accepted Payments"
+    def __str__(self) -> str:
+        return self.market.name
