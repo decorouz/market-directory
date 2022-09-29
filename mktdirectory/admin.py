@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
@@ -13,13 +13,6 @@ from .models import (
     MarketDay,
 )
 from datetime import date, timedelta
-
-
-@admin.register(Commodity)
-class CommodityAdmin(admin.ModelAdmin):
-    list_display = ("name", "overview", "category")
-    list_per_page: int = 10
-    list_editable = ("category",)
 
 
 @admin.register(AcceptedPaymentMethod)
@@ -43,6 +36,7 @@ class MarketDayAdmin(admin.ModelAdmin):
 
 @admin.register(Market)
 class MarketAdmin(admin.ModelAdmin):
+    autocomplete_fields = ("contact_person",)
     list_display = (
         "name",
         "brief_details",
@@ -54,6 +48,8 @@ class MarketAdmin(admin.ModelAdmin):
     )
     list_select_related = ("contact_person",)
     list_per_page = 5
+    prepopulated_fields = {"slug": ["name"]}
+    search_fields = ("name__istartswith",)
 
     @admin.display(ordering="reference_mkt_date")
     def next_market_date(self, market):
@@ -99,6 +95,7 @@ class ContactPersonAdmin(admin.ModelAdmin):
         "market_count",
     )
     list_per_page = 10
+    search_fields = ("first_name__istartswith",)
 
     @admin.display(ordering="market_count")
     def market_count(self, contact_person):
@@ -108,7 +105,7 @@ class ContactPersonAdmin(admin.ModelAdmin):
             + urlencode({"contact_person_id": str(contact_person.id)})
         )
         return format_html(
-            "<a href='{}'>{}</a>", url, contact_person.market_count
+            "<a href='{}'>{} markets</a>", url, contact_person.market_count
         )
 
     def get_queryset(self, request):
@@ -117,3 +114,13 @@ class ContactPersonAdmin(admin.ModelAdmin):
             .get_queryset(request)
             .annotate(market_count=Count("market"))
         )
+
+
+@admin.register(Commodity)
+class CommodityAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "overview",
+        "category",
+    )
+    list_per_page: int = 10
