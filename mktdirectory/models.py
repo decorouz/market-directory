@@ -44,7 +44,7 @@ class ContactPerson(models.Model):
 
 
 class AcceptedPaymentMethod(models.Model):
-    PAYMENT_METHOD_CASH = "CAS"
+    PAYMENT_METHOD_CASH = "CASH"
     PAYMENT_METHOD_POS = "POS"
     PAYMENT_METHOD_TRANSFER = "TF"
     PAYMENT_METHOD_OTHERS = "O"
@@ -55,13 +55,13 @@ class AcceptedPaymentMethod(models.Model):
         (PAYMENT_METHOD_TRANSFER, "Bank Transfer"),
         (PAYMENT_METHOD_OTHERS, "Others"),
     ]
-
     type = models.CharField(
         verbose_name="Accepted Payments",
-        max_length=3,
+        max_length=4,
         choices=PAYMENT_METHODS,
         default=PAYMENT_METHOD_CASH,
     )
+
     description = models.TextField()
     charges = models.FloatField(default=0.0)
 
@@ -70,7 +70,7 @@ class AcceptedPaymentMethod(models.Model):
         verbose_name_plural = "Payment Methods"
 
     def __str__(self) -> str:
-        return self.name
+        return self.type
 
 
 class Market(models.Model):
@@ -120,7 +120,7 @@ class MarketDay(models.Model):
         max_length=1, choices=PRODUCE_CHOICES, default=NEW_PRODUCE
     )
     commodity_price = models.DecimalField(
-        verbose_name=("Price per bag at market date"),
+        verbose_name=("Price per bag"),
         help_text="Price per bag",
         max_digits=8,
         decimal_places=2,
