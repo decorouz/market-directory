@@ -1,11 +1,13 @@
-from django.http import HttpResponse
 from django.shortcuts import render
-from mktdirectory.models import Commodity
+from django.contrib.contenttypes.models import ContentType
+from tag.models import TaggedItem
+from mktdirectory.models import Category, Commodity
 
 # Create your views here.
 def say_hello(request):
-    query_set = Commodity.objects.all()
 
-    for product in query_set:
-        print(product.category_id)
-    return render(request, "hello.html", {"name": "james"})
+    return render(
+        request,
+        "hello.html",
+        {"name": "james"},
+    )
