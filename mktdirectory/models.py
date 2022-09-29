@@ -76,6 +76,7 @@ class AcceptedPaymentMethod(models.Model):
 class Market(models.Model):
     market_code = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=50)
+    slug = models.SlugField()
     accepted_payment_types = models.ManyToManyField(AcceptedPaymentMethod)
     contact_person = models.ForeignKey(
         ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
@@ -85,7 +86,6 @@ class Market(models.Model):
     market_days_interval = models.SmallIntegerField(default=5)
 
     location_description = models.TextField(verbose_name="Market site")
-    slug = models.SlugField()
     reference_mkt_date = models.DateField(
         verbose_name=("Most recent market date")
     )
