@@ -23,15 +23,15 @@ class AcceptablePaymentMethodAdmin(admin.ModelAdmin):
 
 @admin.register(MarketDay)
 class MarketDayAdmin(admin.ModelAdmin):
+    autocomplete_fields = ("market", "commodity")
     list_display = (
         "market_date",
         "market",
         "commodity",
-        "grade",
         "commodity_price",
     )
     list_select_related = ("market", "commodity")
-    list_editable = ("grade", "commodity_price")
+    search_fields = ("commodity__name__istartswith",)
 
 
 @admin.register(Market)
@@ -118,9 +118,11 @@ class ContactPersonAdmin(admin.ModelAdmin):
 
 @admin.register(Commodity)
 class CommodityAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "overview",
-        "category",
-    )
+    list_display = ("custom_name", "overview", "category", "grade")
+    search_fields = ("name",)
     list_per_page: int = 10
+
+    def custom_name(self, commodity: Commodity):
+        if commodity.grade:
+            return f"{commodity.grade}-{commodity.name}"
+        return f"{commodity.name}"
