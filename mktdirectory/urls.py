@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import MarketDetailView, MarketListView
+
+from mktdirectory import views
 
 urlpatterns = [
-    path("", MarketListView.as_view()),
-    path("<str:pk>/", MarketDetailView.as_view()),
+    path("commodities/", views.commodity_list),
+    path("commodities/<int:pk>/", views.commodity_detail),
+    path("markets/", views.market_list),
+    path("markets/<int:pk>/", views.market_detail),
 ]
