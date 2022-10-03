@@ -15,19 +15,41 @@ class Category(models.Model):
 
 class Commodity(models.Model):
 
+    OLD_PRODUCE = "Old"
+    NEW_PRODUCE = "New"
+    NO_GRADE = ""
+
+    PRODUCE_CHOICES = [
+        (NEW_PRODUCE, "New"),
+        (OLD_PRODUCE, "Old"),
+        (NO_GRADE, ""),
+    ]
+
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
+    grade = models.CharField(
+        max_length=3,
+        choices=PRODUCE_CHOICES,
+        default=NEW_PRODUCE,
+        null=True,
+        blank=True,
+    )
     overview = models.TextField(verbose_name="Commodity Description")
 
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "grade"], name="unique_commodity"
+            )
+        ]
         db_table = "sql_commodity"
         verbose_name_plural = "Commodities"
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.grade} {self.name}"
 
 
 class ContactPerson(models.Model):
@@ -104,13 +126,6 @@ class Market(models.Model):
 
 
 class MarketDay(models.Model):
-    OLD_PRODUCE = "O"
-    NEW_PRODUCE = "N"
-
-    PRODUCE_CHOICES = [
-        (OLD_PRODUCE, "New"),
-        (NEW_PRODUCE, "Old"),
-    ]
 
     market = models.ForeignKey(
         Market,
@@ -120,9 +135,7 @@ class MarketDay(models.Model):
         Commodity,
         on_delete=models.CASCADE,
     )
-    grade = models.CharField(
-        max_length=1, choices=PRODUCE_CHOICES, default=NEW_PRODUCE
-    )
+
     commodity_price = models.DecimalField(
         verbose_name=("Price per bag"),
         help_text="Price per bag",
