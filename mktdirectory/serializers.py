@@ -21,11 +21,10 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommoditySerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-
     class Meta:
         model = Commodity
         fields = ("id", "name", "grade", "category", "overview")
+        
 
 
 class ContactPersonSerializer(serializers.ModelSerializer):
