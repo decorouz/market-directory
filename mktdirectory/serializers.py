@@ -1,5 +1,5 @@
-from dataclasses import fields
 from rest_framework import serializers
+from django.db.models import Count
 
 from mktdirectory.models import (
     AcceptedPaymentMethod,
@@ -15,7 +15,7 @@ from datetime import timedelta, date
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ("id", "name", "commodities_count")
+        fields = ("id", "name", "description", "commodities_count")
 
     commodities_count = serializers.IntegerField(read_only=True)
 
@@ -24,7 +24,6 @@ class CommoditySerializer(serializers.ModelSerializer):
     class Meta:
         model = Commodity
         fields = ("id", "name", "grade", "category", "overview")
-        
 
 
 class ContactPersonSerializer(serializers.ModelSerializer):

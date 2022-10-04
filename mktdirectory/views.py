@@ -2,9 +2,53 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from django.db.models import Count
 
-from mktdirectory.models import Commodity, Market
-from mktdirectory.serializers import CommoditySerializer, MarketSerializer
+from mktdirectory.models import Category, Commodity, Market
+from mktdirectory.serializers import (
+    CommoditySerializer,
+    MarketSerializer,
+    CategorySerializer,
+)
+
+
+@api_view(["GET", "POST"])
+def category_list(request):
+    if request.method == "GET":
+        query_set = Category.objects.annotate(
+            commodities_count=Count("commodity")
+        ).all()
+        serializer = CategorySerializer(query_set, many=True)
+        return Response(serializer.data)
+    elif request.method == "POST":
+        serializer = CategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["GET", "PATCH", "DELETE"])
+def category_detail(request, pk):
+    query_set = Category.objects.annotate(commodities_count=Count("commodity"))
+    category = get_object_or_404(query_set, pk=pk)
+    if request.method == "GET":
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
+    elif request.method == "PATCH":
+        serializer = CategorySerializer(category, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    elif request.method == "DELETE":
+        if category.commodity_set.count() > 0:
+            return Response(
+                {
+                    "error": "Category cannot be deleted because it is associated with one or more commodity"
+                },
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["GET", "POST"])
@@ -24,14 +68,14 @@ def commodity_list(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
+@api_view(["GET", "PATCH", "DELETE"])
 def commodity_detail(request, pk):
 
     commodity = get_object_or_404(Commodity, pk=pk)
     if request.method == "GET":
         serializer = CommoditySerializer(commodity)
         return Response(serializer.data)
-    elif request.method == "PUT":
+    elif request.method == "PATCH":
         serializer = CommoditySerializer(commodity, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -41,17 +85,22 @@ def commodity_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view()
+@api_view(["GET", "POST"])
 def market_list(request):
     """List all markets"""
-
-    markets = (
-        Market.objects.select_related("contact_person")
-        .all()
-        .prefetch_related("commodities")
-    )
-    serializers = MarketSerializer(markets, many=True)
-    return Response(serializers.data)
+    if request.method == "GET":
+        query_set = (
+            Market.objects.select_related("contact_person")
+            .all()
+            .prefetch_related("commodities")
+        )
+        serializers = MarketSerializer(query_set, many=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+    elif request.method == "POST":
+        serializer = MarketSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view()
