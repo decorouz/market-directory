@@ -17,24 +17,23 @@ class Commodity(models.Model):
 
     OLD_PRODUCE = "Old"
     NEW_PRODUCE = "New"
-    NO_GRADE = ""
+    NONE = ""
 
     PRODUCE_CHOICES = [
+        (NONE, "---"),
         (NEW_PRODUCE, "New"),
         (OLD_PRODUCE, "Old"),
-        (NO_GRADE, ""),
     ]
-
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
     grade = models.CharField(
         max_length=3,
         choices=PRODUCE_CHOICES,
-        default=NEW_PRODUCE,
-        null=True,
-        blank=True,
+        default=NONE,
     )
-    overview = models.TextField(verbose_name="Commodity Description")
+    overview = models.TextField(
+        verbose_name="Commodity Description", null=True, blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
