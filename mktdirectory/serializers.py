@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db.models import Count
+from rest_framework.validators import UniqueTogetherValidator
 
 from mktdirectory.models import (
     AcceptedPaymentMethod,
@@ -24,6 +25,12 @@ class CommoditySerializer(serializers.ModelSerializer):
     class Meta:
         model = Commodity
         fields = ("id", "name", "grade", "category", "overview")
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Commodity.objects.all(), fields=["name", "grade"]
+            )
+        ]
 
 
 class ContactPersonSerializer(serializers.ModelSerializer):
