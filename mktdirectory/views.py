@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.generics import ListCreateAPIView
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import status
@@ -13,21 +14,17 @@ from mktdirectory.serializers import (
 )
 
 
-class CategoryList(APIView):
-    def get(self, request):
-        query_set = Category.objects.annotate(
+class CategoryList(ListCreateAPIView):
+    def get_queryset(self):
+        return Category.objects.annotate(
             commodities_count=Count("commodity")
         ).all()
-        serializer = CategorySerializer(
-            query_set, many=True, context={"request": request}
-        )
-        return Response(serializer.data)
 
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_serializer_class(self):
+        return CategorySerializer
+
+    def get_serializer_context(self):
+        return {"request": self.request}
 
 
 class CategoryDetail(APIView):
