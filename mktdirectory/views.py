@@ -1,8 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Count
 
@@ -27,27 +29,13 @@ class CategoryList(ListCreateAPIView):
         return {"request": self.request}
 
 
-class CategoryDetail(APIView):
-    def get_object(self, pk):
-        query_set = Category.objects.annotate(
-            commodities_count=Count("commodity")
-        )
-        return get_object_or_404(query_set, pk=pk)
-
-    def get(self, request, pk):
-        category = self.get_object(pk)
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
-
-    def patch(self, request, pk):
-        category = self.get_object(pk)
-        serializer = CategorySerializer(category, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# Category View
+class CategoryDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
     def delete(self, request, pk):
-        category = self.get_object(pk)
+        category = get_object_or_404(Category, pk=pk)
         if category.commodity_set.count() > 0:
             return Response(
                 {
@@ -59,60 +47,37 @@ class CategoryDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET", "POST"])
-def commodity_list(request):
-    """
-    List all commodities
-    """
-    if request.method == "GET":
-        commodities = Commodity.objects.select_related("category").all()
-        serializer = CommoditySerializer(commodities, many=True)
-        return Response(serializer.data)
-    elif request.method == "POST":
-        """create a commodity"""
-        serializer = CommoditySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+class CommodityList(ListCreateAPIView):
+    def get_queryset(self):
+        return Commodity.objects.select_related("category").all()
+
+    def get_serializer_class(self):
+        return CommoditySerializer
 
 
-@api_view(["GET", "PATCH", "DELETE"])
-def commodity_detail(request, pk):
-
-    commodity = get_object_or_404(Commodity, pk=pk)
-    if request.method == "GET":
-        serializer = CommoditySerializer(commodity)
-        return Response(serializer.data)
-    elif request.method == "PATCH":
-        serializer = CommoditySerializer(commodity, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    elif request.method == "DELETE":
-        commodity.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# Commodity Views
+class CommodityDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Commodity.objects.all()
+    serializer_class = CommoditySerializer
 
 
-@api_view(["GET", "POST"])
-def market_list(request):
-    """List all markets"""
-    if request.method == "GET":
+class MarketList(ListCreateAPIView):
+    def get_queryset(self):
         query_set = (
             Market.objects.select_related("contact_person")
             .all()
-            .prefetch_related("commodities")
+            .prefetch_related("commodities", "accepted_payment_types")
         )
-        serializers = MarketSerializer(query_set, many=True)
-        return Response(serializers.data, status=status.HTTP_200_OK)
-    elif request.method == "POST":
-        serializer = MarketSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return query_set
+
+    def get_serializer_class(self):
+        return MarketSerializer
 
 
-@api_view()
-def market_detail(request, pk):
-    market = get_object_or_404(Market, pk=pk)
-    serializers = MarketSerializer(market)
-    return Response(serializers.data)
+class MarketDetail(RetrieveUpdateDestroyAPIView):
+    queryset = (
+        Market.objects.select_related("contact_person")
+        .all()
+        .prefetch_related("commodities")
+    )
+    serializer_class = MarketSerializer
