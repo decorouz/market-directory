@@ -95,15 +95,12 @@ class AcceptedPaymentMethod(models.Model):
 
 
 class Market(models.Model):
-    market_code = models.IntegerField(
-        primary_key=True,
-        editable=False,
-    )
+    market_code = models.IntegerField(primary_key=True, editable=False)
     name = models.CharField(max_length=50)
     slug = models.SlugField()
     accepted_payment_types = models.ManyToManyField(AcceptedPaymentMethod)
     contact_person = models.ForeignKey(
-        ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
+        ContactPerson, on_delete=models.CASCADE, null=True, blank=True
     )
     commodities = models.ManyToManyField(Commodity, through="MarketDay")
     brief_details = models.TextField()
