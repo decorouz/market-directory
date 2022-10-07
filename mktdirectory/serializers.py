@@ -78,13 +78,13 @@ class SimpleCommoditySerializer(serializers.ModelSerializer):
 
 class MarketSerializer(serializers.ModelSerializer):
     contact_person = ContactPersonSerializer()
-    # accepted_payment_types = PaymentTypeSerializer(many=True)
     schedule_in_days = serializers.IntegerField(source="market_days_interval")
     market_site = serializers.CharField(source="location_description")
     next_market_day = serializers.SerializerMethodField(
         method_name="calculate_next_marketdate"
     )
-    commodities = SimpleCommoditySerializer(many=True)
+    commodities = SimpleCommoditySerializer(many=True, read_only=True)
+    accepted_payment_types = PaymentTypeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Market
@@ -99,7 +99,15 @@ class MarketSerializer(serializers.ModelSerializer):
             "contact_person",
             "last_update",
             "commodities",
+            "accepted_payment_types",
         )
+
+    def create(self, validated_data):
+        contact_data = validated_data.pop("contact_person")
+        market = Market.objects.create(**validated_data)
+        for ch in contact_data:
+            ContactPerson.objects.create(market=market, **ch)
+        return market
 
     def calculate_next_marketdate(self, market: Market):
         """Calculate the next market day"""
