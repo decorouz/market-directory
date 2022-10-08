@@ -13,6 +13,50 @@ class Category(models.Model):
         return self.name
 
 
+class ContactPerson(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=50)
+
+    class Meta:
+        db_table = "sql_contact_person"
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name} "
+
+class AcceptedPaymentMethod(models.Model):
+
+    PAYMENT_METHOD_CASH = "CASH"
+    PAYMENT_METHOD_POS = "POS"
+    PAYMENT_METHOD_TRANSFER = "TF"
+    PAYMENT_METHOD_OTHERS = "O"
+
+    PAYMENT_METHODS = [
+        (PAYMENT_METHOD_CASH, "Cash Payment"),
+        (PAYMENT_METHOD_POS, "POS"),
+        (PAYMENT_METHOD_TRANSFER, "Bank Transfer"),
+        (PAYMENT_METHOD_OTHERS, "Others"),
+    ]
+    type = models.CharField(
+        verbose_name="Accepted Payments",
+        max_length=4,
+        choices=PAYMENT_METHODS,
+        default=PAYMENT_METHOD_CASH,
+    )
+
+    description = models.TextField()
+    charges = models.FloatField(default=0.0)
+
+    class Meta:
+        db_table = "sql_payment_method"
+        verbose_name_plural = "Payment Methods"
+
+    def __str__(self) -> str:
+        return self.type
+
+
+
 class Commodity(models.Model):
 
     OLD_PRODUCE = "Old"
@@ -51,51 +95,8 @@ class Commodity(models.Model):
         return f"{self.grade} {self.name}"
 
 
-class ContactPerson(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=50)
-
-    class Meta:
-        db_table = "sql_contact_person"
-
-    def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name} "
-
-
-class AcceptedPaymentMethod(models.Model):
-    PAYMENT_METHOD_CASH = "CASH"
-    PAYMENT_METHOD_POS = "POS"
-    PAYMENT_METHOD_TRANSFER = "TF"
-    PAYMENT_METHOD_OTHERS = "O"
-
-    PAYMENT_METHODS = [
-        (PAYMENT_METHOD_CASH, "Cash Payment"),
-        (PAYMENT_METHOD_POS, "POS"),
-        (PAYMENT_METHOD_TRANSFER, "Bank Transfer"),
-        (PAYMENT_METHOD_OTHERS, "Others"),
-    ]
-    type = models.CharField(
-        verbose_name="Accepted Payments",
-        max_length=4,
-        choices=PAYMENT_METHODS,
-        default=PAYMENT_METHOD_CASH,
-    )
-
-    description = models.TextField()
-    charges = models.FloatField(default=0.0)
-
-    class Meta:
-        db_table = "sql_payment_method"
-        verbose_name_plural = "Payment Methods"
-
-    def __str__(self) -> str:
-        return self.type
-
-
 class Market(models.Model):
-    market_code = models.IntegerField(primary_key=True, editable=False)
+    market_code = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     slug = models.SlugField()
     accepted_payment_types = models.ManyToManyField(AcceptedPaymentMethod)
