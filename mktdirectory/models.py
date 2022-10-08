@@ -104,8 +104,8 @@ class Market(models.Model):
         ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
     )
     commodities = models.ManyToManyField(Commodity, through="MarketDay")
-    brief_details = models.TextField()
-    num_vendors = models.SmallIntegerField()
+    brief_detail = models.TextField()
+    num_vendor = models.SmallIntegerField()
     market_days_interval = models.SmallIntegerField(default=5)
 
     location_description = models.TextField(verbose_name="Market site")
