@@ -4,6 +4,8 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
+
+from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Count
@@ -16,25 +18,17 @@ from mktdirectory.serializers import (
 )
 
 
-class CategoryList(ListCreateAPIView):
-    def get_queryset(self):
-        return Category.objects.annotate(
-            commodities_count=Count("commodity")
-        ).all()
+class CategoryViewSet(ModelViewSet):
+    queryset = Category.objects.annotate(
+        commodities_count=Count("commodity")
+    ).all()
 
-    def get_serializer_class(self):
-        return CategorySerializer
+    serializer_class = CategorySerializer
 
     def get_serializer_context(self):
         return {"request": self.request}
 
-
-# Category View
-class CategoryDetail(RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-    def delete(self, request, pk):
+    def destroy(self, request, pk):
         category = get_object_or_404(Category, pk=pk)
         if category.commodity_set.count() > 0:
             return Response(
@@ -47,37 +41,16 @@ class CategoryDetail(RetrieveUpdateDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CommodityList(ListCreateAPIView):
-    def get_queryset(self):
-        return Commodity.objects.select_related("category").all()
-
-    def get_serializer_class(self):
-        return CommoditySerializer
-
-
-# Commodity Views
-class CommodityDetail(RetrieveUpdateDestroyAPIView):
+class CommodityViewSet(ModelViewSet):
     queryset = Commodity.objects.all()
     serializer_class = CommoditySerializer
 
 
-class MarketList(ListCreateAPIView):
-    def get_queryset(self):
-        query_set = (
-            Market.objects.select_related("contact_person")
-            .all()
-            .prefetch_related("commodities", "accepted_payment_types")
-        )
-        return query_set
-
-    def get_serializer_class(self):
-        return MarketSerializer
-
-
-class MarketDetail(RetrieveUpdateDestroyAPIView):
+class MarketViewSet(ModelViewSet):
     queryset = (
         Market.objects.select_related("contact_person")
         .all()
-        .prefetch_related("commodities")
+        .prefetch_related("commodities", "accepted_payment_types")
     )
+
     serializer_class = MarketSerializer

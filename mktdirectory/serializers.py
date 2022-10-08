@@ -13,35 +13,18 @@ from mktdirectory.models import (
 from datetime import timedelta, date
 
 
+class ContactPersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactPerson
+        fields = ("first_name", "last_name", "phone", "email")
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name", "description", "commodities_count")
 
     commodities_count = serializers.IntegerField(read_only=True)
-
-
-class CommoditySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Commodity
-        fields = ("id", "name", "grade", "category", "overview")
-
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Commodity.objects.all(), fields=["name", "grade"]
-            )
-        ]
-
-
-class ContactPersonSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(method_name="get_fullname")
-
-    class Meta:
-        model = ContactPerson
-        fields = ("full_name", "phone", "email")
-
-    def get_fullname(self, contact_person: ContactPerson):
-        return f"{contact_person.first_name} {contact_person.last_name}"
 
 
 class PaymentTypeSerializer(serializers.ModelSerializer):
@@ -63,6 +46,18 @@ class MarketDaySerializer(serializers.ModelSerializer):
         )
 
 
+class CommoditySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Commodity
+        fields = ("id", "name", "grade", "category", "overview")
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Commodity.objects.all(), fields=["name", "grade"]
+            )
+        ]
+
+
 class SimpleCommoditySerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(method_name="get_name")
 
@@ -77,14 +72,11 @@ class SimpleCommoditySerializer(serializers.ModelSerializer):
 
 
 class MarketSerializer(serializers.ModelSerializer):
-    contact_person = ContactPersonSerializer()
     schedule_in_days = serializers.IntegerField(source="market_days_interval")
     market_site = serializers.CharField(source="location_description")
     next_market_day = serializers.SerializerMethodField(
         method_name="calculate_next_marketdate"
     )
-    commodities = SimpleCommoditySerializer(many=True, read_only=True)
-    accepted_payment_types = PaymentTypeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Market
@@ -97,17 +89,10 @@ class MarketSerializer(serializers.ModelSerializer):
             "num_vendors",
             "next_market_day",
             "contact_person",
-            "last_update",
+            "reference_mkt_date",
             "commodities",
             "accepted_payment_types",
         )
-
-    def create(self, validated_data):
-        contact_data = validated_data.pop("contact_person")
-        market = Market.objects.create(**validated_data)
-        for ch in contact_data:
-            ContactPerson.objects.create(market=market, **ch)
-        return market
 
     def calculate_next_marketdate(self, market: Market):
         """Calculate the next market day"""
