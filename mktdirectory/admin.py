@@ -39,8 +39,8 @@ class MarketAdmin(admin.ModelAdmin):
     autocomplete_fields = ("contact_person",)
     list_display = (
         "name",
-        "brief_details",
-        "num_vendors",
+        "brief_detail",
+        "num_vendor",
         "contact_person",
         "market_days_interval",
         "reference_mkt_date",
