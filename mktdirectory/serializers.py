@@ -83,10 +83,10 @@ class MarketSerializer(serializers.ModelSerializer):
         fields = (
             "market_code",
             "name",
-            "brief_details",
+            "brief_detail",
             "market_site",
             "schedule_in_days",
-            "num_vendors",
+            "num_vendor",
             "next_market_day",
             "contact_person",
             "reference_mkt_date",
