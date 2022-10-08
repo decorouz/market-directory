@@ -28,17 +28,15 @@ class CategoryViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {"request": self.request}
 
-    def destroy(self, request, pk):
-        category = get_object_or_404(Category, pk=pk)
-        if category.commodity_set.count() > 0:
+    def destroy(self, request, *args, **kwargs):
+        if Commodity.objects.filter(category_id=kwargs["pk"]).count() > 0:
             return Response(
                 {
                     "error": "Category can not be deleted because it is associated with one or more Commodity"
                 },
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return super().destroy(request, *args, **kwargs)
 
 
 class CommodityViewSet(ModelViewSet):
