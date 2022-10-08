@@ -25,6 +25,7 @@ class ContactPerson(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} "
 
+
 class AcceptedPaymentMethod(models.Model):
 
     PAYMENT_METHOD_CASH = "CASH"
@@ -54,7 +55,6 @@ class AcceptedPaymentMethod(models.Model):
 
     def __str__(self) -> str:
         return self.type
-
 
 
 class Commodity(models.Model):
@@ -101,7 +101,7 @@ class Market(models.Model):
     slug = models.SlugField()
     accepted_payment_types = models.ManyToManyField(AcceptedPaymentMethod)
     contact_person = models.ForeignKey(
-        ContactPerson, on_delete=models.CASCADE, null=True, blank=True
+        ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
     )
     commodities = models.ManyToManyField(Commodity, through="MarketDay")
     brief_details = models.TextField()
@@ -130,7 +130,7 @@ class MarketDay(models.Model):
     )
     commodity = models.ForeignKey(
         Commodity,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
     )
 
     commodity_price = models.DecimalField(
