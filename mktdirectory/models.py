@@ -110,7 +110,7 @@ class Market(models.Model):
 
     location_description = models.TextField(verbose_name="Market site")
     reference_mkt_date = models.DateField(
-        verbose_name=("Most recent market date")
+        verbose_name=("confirmed market date")
     )
     last_update = models.DateTimeField(auto_now=True)
 
@@ -144,6 +144,11 @@ class MarketDay(models.Model):
     class Meta:
         db_table = "sql_market_date"
         verbose_name = "Market Date"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["commodity", "market_date"], name="unique_item"
+            )
+        ]
 
     def __str__(self) -> str:
         return self.market.name
