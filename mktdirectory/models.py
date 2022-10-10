@@ -64,16 +64,15 @@ class Commodity(models.Model):
     NONE = ""
 
     PRODUCE_CHOICES = [
-        (NONE, "---"),
+        (NONE, ""),
         (NEW_PRODUCE, "New"),
         (OLD_PRODUCE, "Old"),
     ]
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
+    local_name = models.CharField(max_length=50, blank=True, null=True)
     grade = models.CharField(
-        max_length=3,
-        choices=PRODUCE_CHOICES,
-        default=NONE,
+        max_length=3, choices=PRODUCE_CHOICES, default=NONE, blank=True
     )
     overview = models.TextField(
         verbose_name="Commodity Description", null=True, blank=True
@@ -159,7 +158,7 @@ class Review(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateField(auto_now_add=True)
- 
+
     class Meta:
         db_table = "sql_market_review"
 
