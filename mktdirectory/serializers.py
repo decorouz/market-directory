@@ -9,6 +9,7 @@ from mktdirectory.models import (
     Market,
     Category,
     MarketDay,
+    Review,
 )
 from datetime import timedelta, date
 
@@ -58,19 +59,6 @@ class CommoditySerializer(serializers.ModelSerializer):
         ]
 
 
-class SimpleCommoditySerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField(method_name="get_name")
-
-    class Meta:
-        model = Commodity
-        fields = ("name",)
-
-    def get_name(self, obj: Commodity):
-        if obj.grade:
-            return f"{obj.grade}-{obj.name}"
-        return f"{obj.name}"
-
-
 class MarketSerializer(serializers.ModelSerializer):
     schedule_in_days = serializers.IntegerField(source="market_days_interval")
     market_site = serializers.CharField(source="location_description")
@@ -103,3 +91,13 @@ class MarketSerializer(serializers.ModelSerializer):
         while ref_date <= today:
             ref_date = ref_date + interval
         return ref_date
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ("id", "date", "name", "description")
+
+    def create(self, validated_data):
+        market_id = self.context["market_id"]
+        return Review.objects.create(market_id=market_id, **validated_data)

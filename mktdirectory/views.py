@@ -1,20 +1,14 @@
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
-
 from rest_framework.viewsets import ModelViewSet
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Count
 
-from mktdirectory.models import Category, Commodity, Market
+from mktdirectory.models import Category, Commodity, Market, Review
 from mktdirectory.serializers import (
     CommoditySerializer,
     MarketSerializer,
     CategorySerializer,
+    ReviewSerializer,
 )
 
 
@@ -45,10 +39,22 @@ class CommodityViewSet(ModelViewSet):
 
 
 class MarketViewSet(ModelViewSet):
-    queryset = (
-        Market.objects.select_related("contact_person")
-        .all()
-        .prefetch_related("commodities", "accepted_payment_types")
-    )
+
+    queryset = Market.objects.select_related(
+        "contact_person"
+    ).prefetch_related("commodities", "accepted_payment_types")
 
     serializer_class = MarketSerializer
+
+
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(market_id=self.kwargs["market_pk"])
+
+    # Goto Serializer create method
+    def get_serializer_context(self):
+        return {"market_id": self.kwargs["market_pk"]}
