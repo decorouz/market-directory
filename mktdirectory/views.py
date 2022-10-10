@@ -34,11 +34,24 @@ class CategoryViewSet(ModelViewSet):
 
 
 class CommodityViewSet(ModelViewSet):
-    queryset = Commodity.objects.all()
+
     serializer_class = CommoditySerializer
+
+    def get_queryset(self):
+        queryset = Commodity.objects.all()
+        category_id = self.request.query_params.get("category_id")
+        if category_id is not None:
+            queryset = queryset.filter(category_id=category_id)
+        return queryset
 
 
 class MarketViewSet(ModelViewSet):
+    # To-do
+    #Filter by market date
+    #Filter by contact person
+    # Filter by commodities
+    # Filter by location(state, Lga, two)
+    # Filter by payment methods
 
     queryset = Market.objects.select_related(
         "contact_person"
