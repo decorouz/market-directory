@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.db.models import Count
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import MarketFilter
 
 from mktdirectory.models import Category, Commodity, Market, Review
 from mktdirectory.serializers import (
@@ -34,34 +36,36 @@ class CategoryViewSet(ModelViewSet):
 
 
 class CommodityViewSet(ModelViewSet):
+    queryset = Commodity.objects.all()
 
     serializer_class = CommoditySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["category_id", "grade"]
 
-    def get_queryset(self):
-        queryset = Commodity.objects.all()
-        category_id = self.request.query_params.get("category_id")
-        if category_id is not None:
-            queryset = queryset.filter(category_id=category_id)
-        return queryset
+    # filter by category
+    # def get_queryset(self):
+    #     queryset = Commodity.objects.all()
+    #     print(self.request)
+    #     category_id = self.request.query_params.get("category_id")
+    #     print(category_id)
+    #     if category_id is not None:
+    #         queryset = queryset.filter(category_id=category_id)
+    #     return queryset
 
 
 class MarketViewSet(ModelViewSet):
-    # To-do
-    #Filter by market date
-    #Filter by contact person
-    # Filter by commodities
-    # Filter by location(state, Lga, two)
-    # Filter by payment methods
+  
 
     queryset = Market.objects.select_related(
         "contact_person"
     ).prefetch_related("commodities", "accepted_payment_types")
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MarketFilter
     serializer_class = MarketSerializer
 
 
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
 
     serializer_class = ReviewSerializer
 

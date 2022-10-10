@@ -29,12 +29,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # third party apps
+    "django_filters",
     "rest_framework",
     "debug_toolbar",
     # local apps
     "mktdirectory",
     "playground",
-    "tag"
+    "tag",
 ]
 
 # REST_FRAMEWORK
