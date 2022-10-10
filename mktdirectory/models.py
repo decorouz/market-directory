@@ -145,7 +145,8 @@ class MarketDay(models.Model):
         verbose_name = "Market Date"
         constraints = [
             models.UniqueConstraint(
-                fields=["commodity", "market_date"], name="unique_item"
+                fields=["commodity", "market", "market_date"],
+                name="unique_item",
             )
         ]
 
