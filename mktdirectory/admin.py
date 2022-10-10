@@ -118,7 +118,13 @@ class ContactPersonAdmin(admin.ModelAdmin):
 
 @admin.register(Commodity)
 class CommodityAdmin(admin.ModelAdmin):
-    list_display = ("custom_name", "overview", "category", "grade")
+    list_display = (
+        "custom_name",
+        "local_name",
+        "overview",
+        "category",
+        "grade",
+    )
     search_fields = ("name",)
     list_per_page: int = 10
 
