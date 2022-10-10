@@ -3,7 +3,11 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+
+from mktdirectory.pagination import DefaultPagination
 from .filters import MarketFilter
+
 
 from mktdirectory.models import Category, Commodity, Market, Review
 from mktdirectory.serializers import (
@@ -54,15 +58,16 @@ class CommodityViewSet(ModelViewSet):
 
 
 class MarketViewSet(ModelViewSet):
-  
 
     queryset = Market.objects.select_related(
         "contact_person"
     ).prefetch_related("commodities", "accepted_payment_types")
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = MarketFilter
+    search_fields = ["accepted_payment_types__type"]
     serializer_class = MarketSerializer
+    pagination_class = DefaultPagination
 
 
 class ReviewViewSet(ModelViewSet):
