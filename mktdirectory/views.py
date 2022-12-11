@@ -59,9 +59,9 @@ class CommodityViewSet(ModelViewSet):
 
 class MarketViewSet(ModelViewSet):
 
-    queryset = Market.objects.select_related(
-        "contact_person"
-    ).prefetch_related("commodities", "accepted_payment_types")
+    queryset = Market.objects.prefetch_related(
+        "accepted_payment_types", "contact_person"
+    )
 
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = MarketFilter

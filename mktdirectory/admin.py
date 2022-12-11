@@ -10,7 +10,7 @@ from .models import (
     ContactPerson,
     Market,
     AcceptedPaymentMethod,
-    MarketDay,
+    MarketInstance,
 )
 from datetime import date, timedelta
 
@@ -21,8 +21,8 @@ class AcceptablePaymentMethodAdmin(admin.ModelAdmin):
     list_editable = ("charges",)
 
 
-@admin.register(MarketDay)
-class MarketDayAdmin(admin.ModelAdmin):
+@admin.register(MarketInstance)
+class MarketInstanceAdmin(admin.ModelAdmin):
     autocomplete_fields = ("market", "commodity")
     list_display = (
         "market_date",
@@ -48,7 +48,7 @@ class MarketAdmin(admin.ModelAdmin):
     )
     list_select_related = ("contact_person",)
     list_per_page = 5
-    prepopulated_fields = {"slug": ["name"]}
+    # prepopulated_fields = {"slug": ["name"]}
     search_fields = ("name__istartswith",)
 
     @admin.display(ordering="reference_mkt_date")
@@ -73,16 +73,10 @@ class CategoryAdmin(admin.ModelAdmin):
             + "?"
             + urlencode({"category__id": str(category.id)})
         )
-        return format_html(
-            "<a href='{}'>{}</a>", url, category.commodities_count
-        )
+        return format_html("<a href='{}'>{}</a>", url, category.commodities_count)
 
     def get_queryset(self, request):
-        return (
-            super()
-            .get_queryset(request)
-            .annotate(commodities_count=Count("commodity"))
-        )
+        return super().get_queryset(request).annotate(commodities_count=Count("commodity"))
 
 
 @admin.register(ContactPerson)
@@ -104,16 +98,10 @@ class ContactPersonAdmin(admin.ModelAdmin):
             + "?"
             + urlencode({"contact_person_id": str(contact_person.id)})
         )
-        return format_html(
-            "<a href='{}'>{} markets</a>", url, contact_person.market_count
-        )
+        return format_html("<a href='{}'>{} markets</a>", url, contact_person.market_count)
 
     def get_queryset(self, request):
-        return (
-            super()
-            .get_queryset(request)
-            .annotate(market_count=Count("market"))
-        )
+        return super().get_queryset(request).annotate(market_count=Count("market"))
 
 
 @admin.register(Commodity)

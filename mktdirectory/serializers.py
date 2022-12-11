@@ -8,7 +8,7 @@ from mktdirectory.models import (
     ContactPerson,
     Market,
     Category,
-    MarketDay,
+    MarketInstance,
     Review,
 )
 from datetime import timedelta, date
@@ -34,37 +34,29 @@ class PaymentTypeSerializer(serializers.ModelSerializer):
         fields = ("type", "charges")
 
 
-class MarketDaySerializer(serializers.ModelSerializer):
-    # name = serializers.SerializerMethodField(method_name="get_commodity_name")
-
-    class Meta:
-
-        model = MarketDay
-        fields = (
-            "commodity",
-            "grade",
-            "commodity_price",
-        )
-
-
 class CommoditySerializer(serializers.ModelSerializer):
     class Meta:
         model = Commodity
         fields = ("id", "name", "grade", "category", "overview")
 
         validators = [
-            UniqueTogetherValidator(
-                queryset=Commodity.objects.all(), fields=["name", "grade"]
-            )
+            UniqueTogetherValidator(queryset=Commodity.objects.all(), fields=["name", "grade"])
         ]
+
+    # get the price of the commodity at the previous market day.
+
+
+class MarketInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+
+        model = MarketInstance
+        fields = ("id", "commodity")
 
 
 class MarketSerializer(serializers.ModelSerializer):
     schedule_in_days = serializers.IntegerField(source="market_days_interval")
     market_site = serializers.CharField(source="location_description")
-    next_market_day = serializers.SerializerMethodField(
-        method_name="calculate_next_marketdate"
-    )
+    next_market_day = serializers.SerializerMethodField(method_name="calculate_next_marketdate")
 
     class Meta:
         model = Market
@@ -77,10 +69,9 @@ class MarketSerializer(serializers.ModelSerializer):
             "num_vendor",
             "next_market_day",
             "contact_person",
-            "reference_mkt_date",
-            "commodities",
             "accepted_payment_types",
         )
+        depth = 1
 
     def calculate_next_marketdate(self, market: Market):
         """Calculate the next market day"""
@@ -91,6 +82,12 @@ class MarketSerializer(serializers.ModelSerializer):
         while ref_date <= today:
             ref_date = ref_date + interval
         return ref_date
+
+    # get price of commodity at previous market day
+
+    def previous_commodity_price(self, commodity, market):
+        """Get the previous commodity price at a market"""
+        pass
 
 
 class ReviewSerializer(serializers.ModelSerializer):
