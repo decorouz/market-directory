@@ -63,27 +63,21 @@ class AcceptedPaymentMethod(models.Model):
 
 
 class Commodity(models.Model):
-    # product_name
-    # measure : choices, bag, mo
-    # local name
-    # brief description
-    # product grades
-    # recent recorded price
     OLD_PRODUCE = "Old"
     NEW_PRODUCE = "New"
-    NONE = ""
+    NO_GRADE = ""
 
     PRODUCE_CHOICES = [
-        (NONE, ""),
+        (NO_GRADE, ""),
         (NEW_PRODUCE, "New"),
         (OLD_PRODUCE, "Old"),
     ]
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
     local_name = models.CharField(max_length=50, blank=True, null=True)
-    grade = models.CharField(max_length=3, choices=PRODUCE_CHOICES, default=NONE, blank=True)
+    grade = models.CharField(max_length=4, choices=PRODUCE_CHOICES, default=NO_GRADE, blank=True)
     overview = models.TextField(null=True, blank=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "grade"], name="unique_commodity")]
@@ -122,9 +116,7 @@ class Market(models.Model):
         AcceptedPaymentMethod, verbose_name="list of payment methods"
     )
     commodities = models.ManyToManyField(
-        Commodity,
-        through="MarketInstance",
-        verbose_name="list of commodities",
+        Commodity, through="MarketCommodity", verbose_name="list of commodities"
     )
     contact_person = models.ForeignKey(
         ContactPerson, on_delete=models.SET_NULL, null=True, blank=True
@@ -150,17 +142,23 @@ class Market(models.Model):
 
 
 # Commodity Price Monitor Class
-class MarketInstance(models.Model):
+class MarketCommodity(models.Model):
     market = models.ForeignKey(Market, on_delete=models.CASCADE)
     commodity = models.ForeignKey(Commodity, on_delete=models.RESTRICT)
     commodity_price = models.DecimalField(
-        verbose_name=("price per bag"), help_text="Price per bag", max_digits=8, decimal_places=2
+        verbose_name=("price per bag"),
+        help_text="Price per bag",
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
-    market_date = models.DateField()
+    market_date = models.DateField(null=True, blank=True)
 
     class Meta:
-        db_table = "sql_market_instance"
-        verbose_name = "market instance"
+        db_table = "sql_market_commodity"
+        verbose_name = "market commodities"
+        verbose_name_plural = "market commodities"
         constraints = [
             models.UniqueConstraint(
                 fields=["commodity", "market", "market_date"],

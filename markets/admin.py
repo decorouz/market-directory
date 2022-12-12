@@ -10,7 +10,7 @@ from .models import (
     ContactPerson,
     Market,
     AcceptedPaymentMethod,
-    MarketInstance,
+    MarketCommodity,
 )
 from datetime import date, timedelta
 
@@ -21,8 +21,8 @@ class AcceptablePaymentMethodAdmin(admin.ModelAdmin):
     list_editable = ("charges",)
 
 
-@admin.register(MarketInstance)
-class MarketInstanceAdmin(admin.ModelAdmin):
+@admin.register(MarketCommodity)
+class MarketCommodityAdmin(admin.ModelAdmin):
     autocomplete_fields = ("market", "commodity")
     list_display = (
         "market_date",
@@ -34,8 +34,14 @@ class MarketInstanceAdmin(admin.ModelAdmin):
     search_fields = ("commodity__name__istartswith",)
 
 
+class MarketCommodityInline(admin.TabularInline):
+    model = MarketCommodity
+    extra = 2
+
+
 @admin.register(Market)
 class MarketAdmin(admin.ModelAdmin):
+    inlines = (MarketCommodityInline,)
     autocomplete_fields = ("contact_person",)
     list_display = (
         "name",
@@ -48,7 +54,7 @@ class MarketAdmin(admin.ModelAdmin):
     )
     list_select_related = ("contact_person",)
     list_per_page = 5
-    # prepopulated_fields = {"slug": ["name"]}
+
     search_fields = ("name__istartswith",)
 
     @admin.display(ordering="reference_mkt_date")
@@ -69,7 +75,7 @@ class CategoryAdmin(admin.ModelAdmin):
     @admin.display(ordering="commodities_count")
     def commodities_count(self, category):
         url = (
-            reverse("admin:mktdirectory_commodity_changelist")
+            reverse("admin:markets_commodity_changelist")
             + "?"
             + urlencode({"category__id": str(category.id)})
         )
@@ -94,7 +100,7 @@ class ContactPersonAdmin(admin.ModelAdmin):
     @admin.display(ordering="market_count")
     def market_count(self, contact_person):
         url = (
-            reverse("admin:mktdirectory_market_changelist")
+            reverse("admin:markets_market_changelist")
             + "?"
             + urlencode({"contact_person_id": str(contact_person.id)})
         )

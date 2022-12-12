@@ -2,13 +2,13 @@ from rest_framework import serializers
 from django.db.models import Count
 from rest_framework.validators import UniqueTogetherValidator
 
-from mktdirectory.models import (
+from .models import (
     AcceptedPaymentMethod,
     Commodity,
     ContactPerson,
     Market,
     Category,
-    MarketInstance,
+    MarketCommodity,
     Review,
 )
 from datetime import timedelta, date
@@ -49,7 +49,7 @@ class CommoditySerializer(serializers.ModelSerializer):
 class MarketInstanceSerializer(serializers.ModelSerializer):
     class Meta:
 
-        model = MarketInstance
+        model = MarketCommodity
         fields = ("id", "commodity")
 
 
@@ -85,7 +85,7 @@ class MarketSerializer(serializers.ModelSerializer):
 
     # get price of commodity at previous market day
 
-    def previous_commodity_price(self, commodity, market):
+    def get_recent_commodity_price(self, commodity, market):
         """Get the previous commodity price at a market"""
         pass
 

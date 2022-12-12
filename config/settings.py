@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "debug_toolbar",
     # local apps
-    "mktdirectory",
+    "markets",
     "playground",
     "tag",
 ]
