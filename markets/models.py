@@ -104,8 +104,6 @@ class Market(models.Model):
     # market site? limited choices
     # indoor or outdoor or partially
     # next market day and date
-    # avialable products (m2m*)
-    # number of vendors
     # accepted payment methods? limited choices
     # contributors: foreign key
     # local taxes/levies
@@ -114,6 +112,7 @@ class Market(models.Model):
     AWAITING_APPROVAL = "AP"
     APPROVED = "A"
     DECLINED = "D"
+
     LISTING_STATUS_CHOICES = [
         (AWAITING_APPROVAL, "Awaiting Approval"),
         (APPROVED, "Approved"),
@@ -139,9 +138,10 @@ class Market(models.Model):
     location_description = models.TextField(verbose_name="Market site")
     reference_mkt_date = models.DateField(verbose_name=("confirmed market date"))
     status = models.CharField(
-        max_length=2, choices=LISTING_STATUS_CHOICES, default=AWAITING_APPROVAL
+        max_length=2,
+        choices=LISTING_STATUS_CHOICES,
+        default=AWAITING_APPROVAL,
     )
-    created_on = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
@@ -182,7 +182,6 @@ class MarketCommodity(models.Model):
         ]
 
     # get the market dates only
-
     def __str__(self) -> str:
         return self.market.name
 

@@ -41,7 +41,6 @@ class MarketCommodityInline(admin.TabularInline):
 
 @admin.register(Market)
 class MarketAdmin(admin.ModelAdmin):
-    inlines = (MarketCommodityInline,)
     autocomplete_fields = ("contact_person",)
     list_display = (
         "name",
@@ -51,6 +50,7 @@ class MarketAdmin(admin.ModelAdmin):
         "market_days_interval",
         "reference_mkt_date",
         "next_market_date",
+        "is_active",
     )
     list_select_related = ("contact_person",)
     list_per_page = 5

@@ -70,6 +70,7 @@ class MarketSerializer(serializers.ModelSerializer):
             "next_market_day",
             "contact_person",
             "accepted_payment_types",
+            "status",
         )
         depth = 1
 
