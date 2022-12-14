@@ -93,6 +93,9 @@ class Commodity(models.Model):
 
 
 class Market(models.Model):
+
+    # created_by
+    # location address
     # Open Season: All year or seasonal
     # operation days(market days/schedule)
     # sales channels
@@ -107,11 +110,19 @@ class Market(models.Model):
     # contributors: foreign key
     # local taxes/levies
     # Government programs related to markets: choices
+
+    AWAITING_APPROVAL = "AP"
+    APPROVED = "A"
+    DECLINED = "D"
+    LISTING_STATUS_CHOICES = [
+        (AWAITING_APPROVAL, "Awaiting Approval"),
+        (APPROVED, "Approved"),
+        (DECLINED, "Declined"),
+    ]
+
     market_code = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=500, editable=False, null=True)
-    # location address
-    # status
     accepted_payment_types = models.ManyToManyField(
         AcceptedPaymentMethod, verbose_name="list of payment methods"
     )
@@ -127,8 +138,12 @@ class Market(models.Model):
     market_days_interval = models.SmallIntegerField(default=5)
     location_description = models.TextField(verbose_name="Market site")
     reference_mkt_date = models.DateField(verbose_name=("confirmed market date"))
-    is_approved = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=2, choices=LISTING_STATUS_CHOICES, default=AWAITING_APPROVAL
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "sql_market"
