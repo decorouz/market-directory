@@ -99,8 +99,6 @@ class Commodity(models.Model):
 
 class Market(Address):
 
-    # created_by
-    # location address
     # Open Season: All year or seasonal
     # operation days(market days/schedule)
     # sales channels
