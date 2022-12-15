@@ -51,6 +51,7 @@ class MarketAdmin(admin.ModelAdmin):
         "reference_mkt_date",
         "next_market_date",
         "is_active",
+        "status",
     )
     list_select_related = ("contact_person",)
     list_per_page = 5
