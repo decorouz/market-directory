@@ -1,4 +1,5 @@
 from django.db import models
+from core.models import Address, TimeStampedModel
 
 
 class Category(models.Model):
@@ -75,12 +76,16 @@ class Commodity(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     name = models.CharField(max_length=50)
     local_name = models.CharField(max_length=50, blank=True, null=True)
-    grade = models.CharField(max_length=4, choices=PRODUCE_CHOICES, default=NO_GRADE, blank=True)
+    grade = models.CharField(
+        max_length=4, choices=PRODUCE_CHOICES, default=NO_GRADE, blank=True
+    )
     overview = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["name", "grade"], name="unique_commodity")]
+        constraints = [
+            models.UniqueConstraint(fields=["name", "grade"], name="unique_commodity")
+        ]
         db_table = "sql_commodity"
         verbose_name_plural = "commodities"
 
@@ -92,7 +97,7 @@ class Commodity(models.Model):
 # name, email, phone, role
 
 
-class Market(models.Model):
+class Market(Address):
 
     # created_by
     # location address
@@ -142,7 +147,6 @@ class Market(models.Model):
         choices=LISTING_STATUS_CHOICES,
         default=AWAITING_APPROVAL,
     )
-    last_update = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:

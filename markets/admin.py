@@ -44,6 +44,7 @@ class MarketAdmin(admin.ModelAdmin):
     autocomplete_fields = ("contact_person",)
     list_display = (
         "name",
+        "country",
         "brief_detail",
         "num_vendor",
         "contact_person",
@@ -83,7 +84,9 @@ class CategoryAdmin(admin.ModelAdmin):
         return format_html("<a href='{}'>{}</a>", url, category.commodities_count)
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(commodities_count=Count("commodity"))
+        return (
+            super().get_queryset(request).annotate(commodities_count=Count("commodity"))
+        )
 
 
 @admin.register(ContactPerson)
@@ -105,7 +108,9 @@ class ContactPersonAdmin(admin.ModelAdmin):
             + "?"
             + urlencode({"contact_person_id": str(contact_person.id)})
         )
-        return format_html("<a href='{}'>{} markets</a>", url, contact_person.market_count)
+        return format_html(
+            "<a href='{}'>{} markets</a>", url, contact_person.market_count
+        )
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(market_count=Count("market"))
